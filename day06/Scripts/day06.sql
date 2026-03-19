@@ -134,6 +134,11 @@ VALUES(SEQ_ORDER.NEXTVAL, 9, 2);
 INSERT INTO TBL_ORDER
 VALUES(SEQ_ORDER.NEXTVAL, 9, 2);
 
+
+SELECT * FROM TBL_USER;
+SELECT * FROM TBL_PRODUCT;
+SELECT * FROM TBL_ORDER;
+
 -- 1) 상품 이름과 총 판매 매출 조회
 SELECT PRODUCT_NAME, SUM(TBP.PRODUCT_PRICE) || '원' "총 판매 매출"
 FROM TBL_PRODUCT TBP
@@ -202,6 +207,8 @@ JOIN TBL_PRODUCT TBP
 ON TBO.PRODUCT_ID = TBU.ID
 WHERE USER_ADDRESS LIKE '경기도%';
 
+
+
 -- 8) 30대 남성이 가장 많이 구매한 상품의 이름 조회
 SELECT PRODUCT_NAME
 FROM (
@@ -258,7 +265,7 @@ WHERE TBU.USER_AGE > (
 --
 --
 ---- 3) 뉴발란스를 구매한 20대 구매자의 이름 조회
---SELECT TBU.*
+--SELECT TBU.USER_NAME 
 --FROM TBL_ORDER TBO
 --JOIN TBL_PRODUCT TBP
 --ON TBO.PRODUCT_ID = TBP.ID AND TBP.PRODUCT_NAME = '뉴발란스'
@@ -298,29 +305,29 @@ WHERE TBU.USER_AGE > (
 --ON TBO.PRODUCT_ID = TBP.ID;
 --
 ---- 6) 가장 매출이 적은 상품을 구매한 사용자의 이름과, 상품명 조회
-----SELECT TBU.USER_NAME, TBP.PRODUCT_NAME
-----FROM TBL_ORDER TBO
-----JOIN TBL_PRODUCT TBP
-----ON TBO.PRODUCT_ID = TBP.ID
-----JOIN TBL_USER TBU
-----ON TBO.USER_ID = TBU.ID 
-----   AND TBO.PRODUCT_ID = (
-----      SELECT TBP.ID
-----      FROM TBL_PRODUCT TBP
-----      JOIN TBL_ORDER TBO
-----      ON TBP.ID = TBO.PRODUCT_ID
-----      GROUP BY TBP.ID
-----      HAVING COUNT(TBP.ID) = (
-----         SELECT MIN(PRODUCT_COUNT)
-----         FROM (
-----            SELECT TBP.ID, COUNT(TBP.ID) "PRODUCT_COUNT"
-----            FROM TBL_PRODUCT TBP
-----            JOIN TBL_ORDER TBO
-----            ON TBP.ID = TBO.PRODUCT_ID
-----            GROUP BY TBP.ID
-----         )
-----      )
-----   );
+--SELECT TBU.USER_NAME, TBP.PRODUCT_NAME
+--FROM TBL_ORDER TBO
+--JOIN TBL_PRODUCT TBP
+--ON TBO.PRODUCT_ID = TBP.ID
+--JOIN TBL_USER TBU
+--ON TBO.USER_ID = TBU.ID 
+--   AND TBO.PRODUCT_ID = (
+--      SELECT TBP.ID
+--      FROM TBL_PRODUCT TBP
+--      JOIN TBL_ORDER TBO
+--      ON TBP.ID = TBO.PRODUCT_ID
+--      GROUP BY TBP.ID
+--      HAVING COUNT(TBP.ID) = (
+--         SELECT MIN(PRODUCT_COUNT)
+--         FROM (
+--            SELECT TBP.ID, COUNT(TBP.ID) "PRODUCT_COUNT"
+--            FROM TBL_PRODUCT TBP
+--            JOIN TBL_ORDER TBO
+--            ON TBP.ID = TBO.PRODUCT_ID
+--            GROUP BY TBP.ID
+--         )
+--      )
+--   );
 --
 --SELECT TBP.PRODUCT_NAME, TBU.USER_NAME
 --FROM TBL_ORDER TBO
@@ -587,12 +594,25 @@ WHERE ID NOT IN (
 
 
 -- 36) 코튼 볼캡 상품의 재고 수량을 0으로 변경
+UPDATE TBL_PRODUCT 
+SET PRODUCT_STOCK = 0
+WHERE PRODUCT_NAME = '코튼 볼캡';
+
+-- 37) '무신사' 브랜드 상품을 주문한 구매자들의 이름과 연락처를 조회
+SELECT TBU.USER_NAME, TBU.USER_PHONE 
+FROM TBL_ORDER TBO
+JOIN TBL_USER TBU 
+ON TBU.ID = TBO.USER_ID
+JOIN TBL_PRODUCT TBP 
+ON TBP.ID = TBO.PRODUCT_ID 
+WHERE TBP.PRODUCT_BRAND = '무신사'; 
+
+-- 38) '김영희' 구매자가 주문한 상품들의 가격 총합을 계산
+
+-- 39) 상품 할인 중 모든 30% 할인가격 조회
 SELECT * FROM TBL_USER;
 SELECT * FROM TBL_PRODUCT;
 SELECT * FROM TBL_ORDER;
--- 37) '무신사' 브랜드 상품을 주문한 구매자들의 이름과 연락처를 조회
--- 38) '김영희' 구매자가 주문한 상품들의 가격 총합을 계산
--- 39) 상품 할인 중 모든 30% 할인가격 조회
 -- 40) 구매자별로 주문한 상품 개수를 조회
 -- 41) '홍길동' 구매자가 주문한 상품 중 가격이 가장 비싼 상품을 조회
 -- 42) '정유리'와 '강민구'가 주문한 상품들을 조회하되 중복 없이 출력
